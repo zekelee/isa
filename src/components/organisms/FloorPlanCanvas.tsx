@@ -1,6 +1,6 @@
 // src/components/organisms/FloorPlanCanvas.tsx
 import { useEffect } from 'react';
-import { Box } from '@mui/material';
+import { Paper } from '@mui/material';
 import { useItemStore } from '@/store/useItemStore';
 import { usePlacementStore } from '@/store/usePlacementStore';
 import FurnitureBox from '@/components/molecules/FurnitureBox';
@@ -17,7 +17,8 @@ export const FloorPlanCanvas = () => {
   }, [fetchItems, fetchPlacements]);
 
   return (
-    <Box
+    <Paper
+      elevation={3}
       sx={{
         position: 'relative',
         width: '100%',
@@ -26,13 +27,12 @@ export const FloorPlanCanvas = () => {
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
-        border: '1px solid #ccc',
         overflow: 'hidden', // 캔버스 밖으로 나가는 것 방지
       }}
     >
       {items.map((item) => (
         <FurnitureBox key={item.id} item={item} />
       ))}
-    </Box>
+    </Paper>
   );
 };

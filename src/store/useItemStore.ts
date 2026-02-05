@@ -25,22 +25,26 @@ export const useItemStore = create<ItemState>((set, get) => ({
     }
   },
   addItem: async (item) => {
-    const newItem: Item = {
-      id: uuidv4(),
-      width: 0, // 기본값 설정
-      depth: 0, // 기본값 설정
+    const defaults = {
+      width: 0,
+      depth: 0,
       price: null,
-      status: 'todo',
+      status: 'todo' as const,
       purchase_url: null,
-      ...item,
     };
+    const newItem: Item = {
+      ...defaults,
+      ...item,
+      id: uuidv4(), // id는 항상 새로 생성하여 덮어씁니다.
+    };
+
     const oldItems = get().items;
     set({ items: [...oldItems, newItem] });
 
     const { error } = await supabase.from('items').insert(newItem);
     if (error) {
       console.error('Error adding item:', error);
-      set({ items: oldItems });
+      set({ items: oldItems }); // 에러 발생 시 롤백
     }
   },
   updateItem: async (itemId, itemUpdate) => {

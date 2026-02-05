@@ -8,10 +8,10 @@ function App() {
       <CssBaseline />
       <Box sx={{ height: '100vh', width: '100vw', display: 'flex' }}>
         <Grid container sx={{ flexGrow: 1 }}>
-          <Grid xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <FloorPlanCanvas />
           </Grid>
-          <Grid xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Sidebar />
           </Grid>
         </Grid>
