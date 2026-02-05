@@ -1,38 +1,38 @@
 // src/components/organisms/FloorPlanCanvas.tsx
-import { useEffect } from 'react';
-import { Paper } from '@mui/material';
-import { useItemStore } from '@/store/useItemStore';
-import { usePlacementStore } from '@/store/usePlacementStore';
-import FurnitureBox from '@/components/molecules/FurnitureBox';
-import mapImage from '@/assets/img/map.png';
+import { useEffect } from 'react'
+import { Paper } from '@mui/material'
+import { useItemStore } from '@/store/useItemStore'
+import { usePlacementStore } from '@/store/usePlacementStore'
+import FurnitureBox from '@/components/molecules/FurnitureBox'
+import mapImage from '@/assets/img/map.png'
 
 export const FloorPlanCanvas = () => {
-  const { items, fetchItems } = useItemStore();
-  const { fetchPlacements } = usePlacementStore();
+  const { items, fetchItems } = useItemStore()
+  const { fetchPlacements } = usePlacementStore()
 
   useEffect(() => {
     // 컴포넌트 마운트 시 아이템과 배치 정보를 모두 불러옵니다.
-    fetchItems();
-    fetchPlacements();
-  }, [fetchItems, fetchPlacements]);
+    fetchItems()
+    fetchPlacements()
+  }, [fetchItems, fetchPlacements])
 
   return (
     <Paper
-      elevation={3}
       sx={{
-        position: 'relative',
         width: '100%',
-        height: '100%', // 부모 컨테이너에 맞게 높이 조정
+        maxWidth: '1200px', // 적절한 최대 너비
+        aspectRatio: '1088 / 705', // ★ 중요: 아까 잘라온 이미지의 가로:세로 비율 입력
+        position: 'relative',
         backgroundImage: `url(${mapImage})`,
-        backgroundSize: 'contain',
+        backgroundSize: '100% 100%', // 이미지를 부모 박스에 꽉 채움
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        overflow: 'hidden', // 캔버스 밖으로 나가는 것 방지
+        overflow: 'hidden', // 가구가 튀어나가지 않게
+        mx: 'auto'
       }}
     >
       {items.map((item) => (
         <FurnitureBox key={item.id} item={item} />
       ))}
     </Paper>
-  );
-};
+  )
+}

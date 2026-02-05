@@ -1,61 +1,54 @@
-// src/components/molecules/FurnitureBox.tsx
-import React, { useMemo, useRef } from 'react';
-import Draggable from 'react-draggable';
-import { Box } from '@mui/material';
-import { useScale } from '@/hooks/useScale';
-import { usePlacement } from '@/hooks/usePlacement';
-import { usePlacementStore } from '@/store/usePlacementStore';
-import { floorPlan } from '@/constants/floorPlan'; // 도면 정보를 가져옵니다.
-import type { Database } from '@/types';
+import React, { useState, useEffect, useRef } from 'react'
+import Draggable from 'react-draggable'
+import { Box, Typography } from '@mui/material'
+import { useScale } from '@/hooks/useScale'
+import { usePlacement } from '@/hooks/usePlacement'
+import { usePlacementStore } from '@/store/usePlacementStore'
+import type { Database } from '@/types'
 
-type Item = Database['public']['Tables']['items']['Row'];
+type Item = Database['public']['Tables']['items']['Row']
 
 interface FurnitureBoxProps {
-  item: Item;
+  item: Item
 }
 
 const FurnitureBox: React.FC<FurnitureBoxProps> = ({ item }) => {
-  const { updatePlacement } = usePlacement();
+  const { updatePlacement } = usePlacement()
   const placement = usePlacementStore((state) =>
     state.placements.find((p) => p.item_id === item.id)
-  );
-  const nodeRef = useRef(null);
+  )
 
-  const scaledWidth = useScale(item.width);
-  const scaledDepth = useScale(item.depth);
+  const nodeRef = useRef(null)
+  const scaledWidth = useScale(item.width)
+  const scaledDepth = useScale(item.depth)
 
-  const bounds = useMemo(() => {
-    if (!floorPlan || floorPlan.length === 0) {
-      return 'parent';
+  // 1. 떨림 방지를 위한 로컬 좌표 상태 (핵심!)
+  const [controlledPos, setControlledPos] = useState({ x: 0, y: 0 })
+
+  // 2. DB에서 값이 바뀌었을 때만 로컬 좌표 업데이트
+  useEffect(() => {
+    if (placement) {
+      setControlledPos({ x: placement.x, y: placement.y })
     }
+  }, [placement?.x, placement?.y])
 
-    const minX = Math.min(...floorPlan.map((r) => r.x));
-    const minY = Math.min(...floorPlan.map((r) => r.y));
-    const maxX = Math.max(...floorPlan.map((r) => r.x + r.width));
-    const maxY = Math.max(...floorPlan.map((r) => r.y + r.height));
-
-    return {
-      left: minX,
-      top: minY,
-      right: maxX - scaledWidth,
-      bottom: maxY - scaledDepth,
-    };
-  }, [scaledWidth, scaledDepth]);
-
+  // 3. 드래그 중에는 UI만 부드럽게 업데이트
   const handleDrag = (_e: any, data: { x: number; y: number }) => {
-    // 참고: onDrag는 드래그 중 계속 호출되어 DB에 많은 요청을 보낼 수 있습니다.
-    // 성능 최적화가 필요하다면 이 부분을 디바운스(debounce) 처리하는 것을 고려해보세요.
-    updatePlacement(item.id, data.x, data.y);
-  };
+    setControlledPos({ x: data.x, y: data.y })
+  }
 
-  const position = placement ? { x: placement.x, y: placement.y } : { x: 0, y: 0 };
+  // 4. 드래그 종료 시에만 DB에 저장 (성능 및 떨림 해결)
+  const handleStop = (_e: any, data: { x: number; y: number }) => {
+    updatePlacement(item.id, data.x, data.y)
+  }
 
   return (
     <Draggable
       nodeRef={nodeRef}
-      bounds={bounds}
-      position={position}
-      onDrag={handleDrag} // onStop에서 onDrag로 변경하여 실시간 저장
+      bounds="parent" // bounds를 'parent'로 설정하여 캔버스 이미지 안으로 한정
+      position={controlledPos}
+      onDrag={handleDrag}
+      onStop={handleStop}
       grid={[1, 1]}
     >
       <Box
@@ -63,21 +56,42 @@ const FurnitureBox: React.FC<FurnitureBoxProps> = ({ item }) => {
         sx={{
           width: `${scaledWidth}px`,
           height: `${scaledDepth}px`,
-          border: '1px solid black',
-          backgroundColor: 'rgba(255, 165, 0, 0.5)',
+          backgroundColor: 'rgba(0, 150, 136, 0.7)', // 더 깔끔한 테마 컬러
+          border: '2px solid #00796b',
+          borderRadius: '4px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          cursor: 'move',
+          cursor: 'grab',
           position: 'absolute',
           boxSizing: 'border-box',
-          zIndex: 1, // 가구가 배경(Paper)보다 위에 오도록 z-index 설정
+          zIndex: 10,
+          boxShadow: '0px 4px 10px rgba(0,0,0,0.2)',
+          '&:active': { cursor: 'grabbing', scale: 1.02 },
+          transition: 'scale 0.1s, background-color 0.2s',
+          userSelect: 'none'
         }}
       >
-        <span style={{ fontSize: '10px', userSelect: 'none' }}>{item.name}</span>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '11px',
+            fontWeight: 'bold',
+            color: 'white',
+            textAlign: 'center',
+            lineHeight: 1.1,
+            pointerEvents: 'none' // 텍스트가 드래그를 방해하지 않도록
+          }}
+        >
+          {item.name}
+          <br />
+          <span style={{ fontSize: '9px', opacity: 0.8 }}>
+            {item.width}x{item.depth}
+          </span>
+        </Typography>
       </Box>
     </Draggable>
-  );
-};
+  )
+}
 
-export default FurnitureBox;
+export default FurnitureBox
