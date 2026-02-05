@@ -6,22 +6,12 @@ function App() {
   return (
     <>
       <CssBaseline />
-      <Box sx={{ height: '100vh', width: '100vw' }}>
-        <Grid container sx={{ height: '100%' }}>
-          <Grid
-            sx={{
-              height: '100%',
-              gridColumn: { xs: 'span 12', md: 'span 8' },
-            }}
-          >
+      <Box sx={{ height: '100vh', width: '100vw', display: 'flex' }}>
+        <Grid container sx={{ flexGrow: 1 }}>
+          <Grid xs={12} md={8}>
             <FloorPlanCanvas />
           </Grid>
-          <Grid
-            sx={{
-              height: '100%',
-              gridColumn: { xs: 'span 12', md: 'span 4' },
-            }}
-          >
+          <Grid xs={12} md={4}>
             <Sidebar />
           </Grid>
         </Grid>

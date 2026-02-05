@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import { useItemStore } from '@/store/useItemStore';
 import { usePlacementStore } from '@/store/usePlacementStore';
 import FurnitureBox from '@/components/molecules/FurnitureBox';
+import mapImage from '@/assets/img/map.png';
 
 export const FloorPlanCanvas = () => {
   const { items, fetchItems } = useItemStore();
@@ -20,11 +21,11 @@ export const FloorPlanCanvas = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '100vh', // 전체 뷰포트 높이
-        backgroundColor: '#f0f0f0',
-        backgroundImage:
-          'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)',
-        backgroundSize: '20px 20px',
+        height: '100%', // 부모 컨테이너에 맞게 높이 조정
+        backgroundImage: `url(${mapImage})`,
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
         border: '1px solid #ccc',
         overflow: 'hidden', // 캔버스 밖으로 나가는 것 방지
       }}
