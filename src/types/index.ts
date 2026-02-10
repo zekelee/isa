@@ -13,80 +13,52 @@ export interface Database {
         Row: {
           id: string
           name: string
-          width: number
-          depth: number
           price: number | null
-          status: 'todo' | 'bought' | 'installed' | null
-          purchase_url: string | null
+          memo: string | null
+          purchased: boolean
+          sort_order: number
         }
         Insert: {
           id?: string
           name: string
-          width: number
-          depth: number
           price?: number | null
-          status?: 'todo' | 'bought' | 'installed' | null
-          purchase_url?: string | null
+          memo?: string | null
+          purchased?: boolean
+          sort_order?: number
         }
         Update: {
           id?: string
           name?: string
-          width?: number
-          depth?: number
           price?: number | null
-          status?: 'todo' | 'bought' | 'installed' | null
-          purchase_url?: string | null
+          memo?: string | null
+          purchased?: boolean
+          sort_order?: number
         }
         Relationships: []
       }
-      checklists: {
+      todos: {
         Row: {
           id: string
           task: string
           completed: boolean
           created_at: string
+          sort_order: number
         }
         Insert: {
           id?: string
           task: string
           completed?: boolean
           created_at?: string
+          sort_order?: number
         }
         Update: {
           id?: string
           task?: string
           completed?: boolean
           created_at?: string
+          sort_order?: number
         }
         Relationships: []
-      }
-      placements: {
-        Row: {
-          item_id: string
-          x: number
-          y: number
-          rotation: number
-        }
-        Insert: {
-          item_id: string
-          x?: number
-          y?: number
-          rotation?: number
-        }
-        Update: {
-          item_id?: string
-          x?: number
-          y?: number
-          rotation?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "placements_item_id_fkey"
-            columns: ["item_id"]
-            referencedRelation: "items"
-            referencedColumns: ["id"]
-          }
-        ]
       }
     }
     Views: {
